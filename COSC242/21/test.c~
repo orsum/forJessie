@@ -1,0 +1,13 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include "mylib.h"
+#include "graph.h"
+
+int main(void){
+
+    graph g = graph_new(5);
+    graph_print(g);
+    graph_free(g);
+
+    return EXIT_SUCCESS;
+}

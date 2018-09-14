@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define ARRAY_MAX 30000
+
+void *merge_sort(int *a, int *w, int l) {
+    int mid;
+    if (l < 2){
+        return a;
+    }
+    mid = l/2;
+    merge_sort(a, w, mid);
+    merge_sort(a + mid, w, l - mid);
+    merge()
+    
+    
+    
+    /* take care of stopping condition first
+    if the array to be sorted has fewer than two elements then return
+               call merge_sort on the first half of array a
+               call merge_sort on the second half of array a
+               merge the two halves of array a into array w
+               copy array w back into array a
+    */
+
+    
+}
+
+void *merge (int *a, int *w, int l){
+    int i, j, k;
+    i = 0;
+    j = l-(l/2);
+    k = 0;
+    while (i < l/2 && j < l){
+        if (a[i] < a[j]){
+            w[k] = a[i];
+            i++;
+        } else if (a[i] >= a[j]){
+            w[k] = a[j];
+            j++;
+        }
+        k++;
+    }
+    if (i >= l/2){
+        for ( ;j < l ; j++){
+            w[k] = a[j];
+            k++;
+        }
+    } else {
+        for (; i < l/2; i++){
+            w[k] = a[i];
+            k++;
+        }
+    }
+    return w;
+}
+
+
+
+int main(void) {
+    
+    int my_array[ARRAY_MAX];
+    
+    clock_t start, end;
+    
+    int i, count = 0;
+    
+    while (count < ARRAY_MAX && 1 == scanf("%d", &my_array[count])) {
+        count++;
+    }
+    
+    start = clock();
+    insertion_sort(my_array, count);
+    end = clock();
+    
+    for (i = 0; i < count; i++) {
+        printf("%d\n", my_array[i]);
+    }
+    
+    fprintf(stderr, "%d %f\n", count, (end - start) / (double)CLOCKS_PER_SEC);
+    
+    return EXIT_SUCCESS;
+}

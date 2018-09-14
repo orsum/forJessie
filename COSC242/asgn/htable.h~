@@ -1,0 +1,21 @@
+#ifndef HTABLE_H_
+#define HTABLE_H_
+
+#include <stdio.h>
+#include "container.h"
+
+typedef struct htablerec *htable;
+
+extern htable htable_new(int container_type, int size);
+extern void htable_free(htable h);
+extern int htable_insert(htable h, char *str/*, container c*/);
+extern void htable_print(htable h, FILE *stream);
+extern int htable_search(htable h, char *key);
+
+
+#endif /* htable_h */
+
+
+
+
+

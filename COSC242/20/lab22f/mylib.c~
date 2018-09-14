@@ -1,0 +1,19 @@
+#include <stdlib.h>
+#include <stdio.h>
+
+void *emalloc(size_t s){
+    void* a = malloc(s);
+    if (a == NULL){
+        exit(EXIT_FAILURE);
+    }
+    return a;
+}
+
+void *erealloc(void *a, size_t s){
+
+    a = realloc(a, s);
+    if (a == NULL){
+        exit(EXIT_FAILURE);
+    }
+    return a;
+}

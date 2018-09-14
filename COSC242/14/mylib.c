@@ -1,0 +1,152 @@
+#include <stdio.h> /* for fprintf */
+#include <stdlib.h> /* for size_t, malloc, realloc, exit */
+#include <assert.h>
+#include <ctype.h>
+#include "mylib.h"
+
+/* Allocates memory space of a given size and returns it if successful*/
+void *emalloc(size_t s) {
+    
+    void *p = malloc(s);
+    if (p == NULL){
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    return p;
+}
+
+/* Allocates more space for an array, called if an array is at capacity and
+ needs to be expanded*/
+void *erealloc(void *p, size_t s) {
+    
+    p = realloc(p, s);
+    if (p == NULL){
+        fprintf(stderr, "Memory reallocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    return p;
+}
+
+/* merges two sorted arrays into one array (a = new array, w = workspace, l = length of the array together).  Used with mergesort*/
+void merge (int *a, int *w, int l){
+    int i, j, k;
+    i = 0;
+    j = (l/2);
+    k = 0;
+    while (i < l/2 && j < l){
+        if (a[i] < a[j]){
+            w[k] = a[i];
+            i++;
+        } else{
+            w[k] = a[j];
+            j++;
+        }
+        k++;
+    }
+    if (i >= l/2){
+        for (; j < l ; j++){
+            w[k] = a[j];
+            k++;
+        }
+    } else {
+        for (; i < l/2; i++){
+            w[k] = a[i];
+            k++;
+        }
+    }
+    return;
+}
+
+/* sorts an array by taking one item and inserting it in the correct place in
+   the group of already sorted elements. */
+void insertion_sort(int *a, int n) {
+    int p;
+    int key;
+    int i;
+    for (p = 1; p < n; p++){
+        key = a[p]; 
+        i = p;
+        while (key < a[i-1] && i > 0){ 
+            a[i] = a[i-1];
+            i--;
+        }
+        a[i] = key;
+    }
+}
+
+/* takes an array, a workspace the size of the array and the length of the current part of the array and sorts it using a merge sort and insertion sort when segments are small enough.
+ */
+void merge_sort(int *a, int *w, int l) {
+    int mid, i;
+    if (l < 2){
+        return;
+    }
+    if (l <= 40){
+        insertion_sort(a, l);
+    } else {
+        mid = l/2;
+        merge_sort(a, w, mid);
+        merge_sort(a + mid, w, l - mid);
+        merge(a, w, l);
+        for (i = 0; i < l; i++){
+            a[i] = w[i];
+        }
+    }
+}
+
+/* takes an array and a length and sorts the array using the first int as a
+   pivot and recursively in place, it swaps the elements around the pivot so
+   the front half is smaller than the back, calls itself on each half and then
+   returns. */
+void quick_sort(int *a , int l){
+    int pivot, i, j, temp;
+    if (l < 2){
+        return;
+    }
+    pivot = a[0];
+    i = -1;
+    j = l;
+    for (;;){
+        do {
+            j--;
+        } while (a[j] > pivot);
+        do {
+            i++;
+        } while (a[i] < pivot);
+        if (i < j){
+            temp = a[i];
+            a[i] = a[j];
+            a[j] = temp;
+        } else {
+            break;
+        }
+    }
+    quick_sort(a, j + 1);
+    quick_sort(a + j + 1, l - j - 1);   
+}
+
+
+int getword(char *s, int limit, FILE *stream) {
+    int c;
+    char *w = s;
+    assert(limit > 0 && s != NULL && stream != NULL);
+    /* skip to the start of the word */
+    while (!isalnum(c = getc(stream)) && EOF != c)
+        ;
+    if (EOF == c) {
+        return EOF;
+    } else if (--limit > 0) { /* reduce limit by 1 to allow for the \0 */
+        *w++ = tolower(c);
+    }
+    while (--limit > 0) {
+        if (isalnum(c = getc(stream))) {
+            *w++ = tolower(c);
+        } else if ('\'' == c) {
+            limit++;
+        } else {
+            break;
+        }
+    }
+    *w = '\0';
+    return w - s;
+}

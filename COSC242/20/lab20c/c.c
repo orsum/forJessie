@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void repeats(int *my_array, int array_size){
+    int i, j;
+    int k = 0;
+    int *count_array = malloc((array_size+1) * sizeof my_array[0]);
+    for (i = 0; i < array_size; i++){
+        count_array[i] = 0;
+        
+    }
+    for (i = 0; i < array_size; i++){
+        count_array[my_array[i]]++;
+    }
+    for (j = 0; j < array_size; j++){
+        if (count_array[j] > 1){
+            printf("%d occurs %d times\n", j, count_array[j]);
+        }
+    }
+    free(count_array);
+}
+
+int main(void) {
+    
+    int array_size = 0;
+    int *my_array;
+    int i=0;
+    printf("Enter the size of the array:\n");
+    scanf("%d", &array_size);
+    
+    my_array = malloc(array_size * sizeof my_array[0]);
+    
+    if (NULL == my_array) {
+        fprintf(stderr, "memory allocation failed!\n");
+        return EXIT_FAILURE;
+    }
+    
+    for (i = 0; i < array_size; i++) {
+        my_array[i] = rand() % array_size;
+    }
+    
+    printf("What's in the array:\n");
+    for (i = 0; i < array_size; i++) {
+        printf("%d ", my_array[i]);
+        
+    }
+    printf("\n");
+    repeats(my_array, array_size);
+
+    
+    free(my_array);
+    return EXIT_SUCCESS;
+}

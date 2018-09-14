@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main(void) {
+    
+    /* variable declarations */
+    int i = 0;
+    int f = 0;
+    int g = 1;
+    int l = 1;
+    
+    for (i = 0; i < 40; i++) {
+        int s = g;
+        printf("%10d ", g);
+        g = f + g;
+        f = s;
+        if (l == 5){
+            printf("\n");
+            l = 0;
+        }
+        l++;
+    }
+    
+    return EXIT_SUCCESS; /* defined in stdlib.h */
+}

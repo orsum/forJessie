@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "mylib.h"
+#include "htable.h"
+
+
+static unsigned int htable_word_to_int(char* word){
+    unsigned int result = 0;
+
+    while (*word != '\0') {
+        result = (*word++ + 31 * result);
+    }
+    return result;
+}
+
+struct htablerec {
+    int num_keys;
+    char **keys;
+    int *frequencies;
+    int capacity;
+};
+
+void htable_free(htable h){
+    int i;
+    for (i = 0; i < h->capacity; i++){
+        free(h->keys[i]);
+    }
+    free(h->frequencies);
+    free(h);
+}
+
+/* convert to int, find where it goes, check if its empty,
+   1. if empty, copy and inc freq
+   2. same string is in that position, inc freq
+   3. different string is in that position, keepmoving along array
+   till you find a space (copy/ inc freq) or dont (new with bigger capacity)
+*/
+int htable_insert(htable h, char *str){
+    unsigned int p, start;
+    p = htable_word_to_int(str);
+    p = p % h->capacity;
+    start = p;
+    do {
+        if (h->frequencies[p] == 0){
+            strcpy(h->keys[p],str);
+            h->frequencies[p]++;
+            return h->frequencies[p];
+        } else if (strcmp(h->keys[p],str) == 0){
+            h->frequencies[p]++;
+            return h->frequencies[p];
+        } else if (strcmp(h->keys[p],str) != 0){
+            p++;
+            p = p % h->capacity;
+        }
+    } while (p != start);
+    return 0;
+}
+
+htable htable_new(int capacity) {
+    int n = 0;
+    htable result = emalloc (sizeof *result);
+    result->capacity = capacity;
+    result->num_keys = 0;
+    result->frequencies=emalloc(result->capacity*sizeof result->frequencies[0]);
+    result->keys = emalloc(result->capacity * sizeof result->keys[0][0]);
+    while (n<capacity){
+        result->frequencies[n] = 0;
+        result->keys[n] = NULL;
+    }
+    return result;
+}
+
+void htable_print(htable h, FILE *stream){
+    int i;
+    for (i = 0; i < h->capacity; i++){
+        if (h->frequencies[i] != 0){
+            fprintf(stream, "%i %s", h->frequencies[i],  h->keys[i]);
+        }
+    }
+}
+
+int htable_search(htable h, char *str){
+    return -1;
+}

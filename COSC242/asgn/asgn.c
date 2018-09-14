@@ -1,0 +1,118 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <getopt.h>
+#include <time.h>
+#include "mylib.h"
+#include "rbt.h"
+#include "container.h"
+#include "flexarray.h"
+#include "htable.h"
+
+/**@author Ali Morris, Abigail Tubay and Chenyang Zhang
+   This is the main function for the assignment. It checks options from the
+   command line and then reads a file into a htable of containers. It then reads
+   from stdin and prints anywords that are not in the first file.
+   options: r - changes from using the default flex array to the red black tree
+   as container type.
+   s - changes the default hashtable size to the one from the argument.
+   p - prints all the words in the hashtable and labels their line.
+   i - prints the times for filling and searching and unknown words.
+   h - prints a help message.
+   
+*/
+int main(int argc, char **argv){
+    char word[50];
+    htable h = NULL;
+    clock_t fill_start, fill_end, search_start, search_end;
+    const char *optstring = "rs:pih";
+    char option;
+    int unknown_words = 0;
+    int i = 0;
+    int p = 0;
+    char container_type = 'f';
+    int htable_size = 3877;
+    FILE *infile;
+
+    while ((option = getopt(argc, argv, optstring)) != -1){;
+        switch(option){
+            case 'r':
+                container_type = 'r';;
+                break;
+
+            case 's':
+                htable_size = atoi(optarg);
+                break;
+
+            case '?':
+                if (optopt == 'c')
+                    fprintf (stderr, "Option -%c needs an argument\n", optopt);
+                else
+                    fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+                break;
+
+            case 'p':
+                p = 1;
+                break;
+
+            case 'i':
+                i = 1;
+                break;
+
+            case 'h':
+            default:
+                fprintf(stderr, "Options:r - changes from using the default " 
+                        "flex array to the red black tree as container type.\n\t"
+                        "s - changes the default hashtable size to the one from the"
+                        "argument.\n\t"
+                        "p - prints all the words in the hashtable and labels their"
+                        "line. \n\t"
+                        "i - prints the times for filling and searching and unknown"
+                        "words.\n\t"
+                        "h - prints a help message.\n");
+                return EXIT_SUCCESS;
+        }
+    }
+
+    
+    if (NULL == (infile = fopen(argv[optind], "r"))){
+        fprintf(stderr, "%s: can’t find file %s\n", argv[0], argv[1]);
+        exit(EXIT_FAILURE);
+    }
+    
+    h = htable_new(htable_size);
+    fill_start = clock();
+
+    while (getword(word, sizeof word, infile) != EOF){ 
+        htable_insert(h, word, container_type);
+    }
+
+    fclose(infile);
+
+    if (p == 1){
+        htable_print(h, stdout);
+        return EXIT_SUCCESS;
+    }
+
+    fill_end = clock();
+    search_start = clock();
+    
+    while (getword(word, sizeof word, stdin) != EOF){
+        if (htable_search(h, word) == 0){
+            printf("%s\n", word);
+            unknown_words++;
+        }
+    }
+
+    if (i != 0){
+        search_end = clock();
+        fprintf(stderr, "Fill time: %f\n",
+                (fill_end-fill_start)/(double)CLOCKS_PER_SEC);
+        fprintf(stderr, "Search time: %f\n",
+                (search_end-search_start)/(double)CLOCKS_PER_SEC);
+        fprintf(stderr, "Unknown Words: %i\n", unknown_words);
+    }
+
+    htable_free(h);
+
+    return EXIT_SUCCESS;
+}

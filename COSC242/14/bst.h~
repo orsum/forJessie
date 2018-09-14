@@ -1,0 +1,2 @@
+typedef struct bst_node *bst;
+

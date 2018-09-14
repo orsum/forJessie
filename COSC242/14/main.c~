@@ -1,0 +1,18 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "mylib.h"
+#include "bst.h"
+
+void print_key(char *s) {
+    printf("%s\n", s);
+}
+
+int main(void) {
+    bst b = bst_new();
+    b = bst_insert(b, "H");
+    b = bst_insert(b, "D");
+    b = bst_insert(b, "L");
+    bst_inorder(b, print_key);
+
+    return EXIT_SUCCESS;
+}

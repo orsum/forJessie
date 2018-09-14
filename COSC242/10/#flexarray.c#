@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "mylib.h"
+#include "flexarray.h"
+
+#define WORD_LENGTH 80
+
+
+/* creates an object that consists of named members of various types */
+struct flexarrayrec {
+    int capacity;
+    int itemcount;
+    char *words[WORD_LENGTH];
+};
+
+/* creates a new flex array of default size and sets default values */
+flexarray flexarray_new() {
+    flexarray result = emalloc(sizeof *result);
+    result->capacity = 2;
+    result->itemcount = 0;
+    result->word = emalloc(result->capacity * sizeof result->word[0][0]);
+    return result;
+}
+/* adds a new item to the flexarray and doubles the size if the capacity is
+   reached  */
+void flexarray_append(flexarray f, char *newword) {
+    if (f->itemcount == f->capacity) {
+        f->capacity += f->capacity;
+        f->words = erealloc(f->words, f->capacity * sizeof f->word[0][0]);
+    }
+    strcpy(f->words[f->itemcount], newword);
+    f->itemcount++;
+}
+/* Prints each item in the flexarray  */
+void flexarray_print(flexarray f) {
+    int i;
+    for (i = 0; i < f->itemcount; i++){
+        printf("%s\n", f->word[i]);
+    }
+}
+
+/* sorts the items in the flex array using merge sort */
+void flexarray_sort(flexarray f) {
+    void *w = emalloc(f->itemcount * sizeof f[0][0]);
+    merge_sort(f->words, w, f->itemcount);
+    free(w);
+}
+
+/* frees the memory allocated to the flex array */
+void flexarray_free(flexarray f) {
+    free(f->items);
+    free(f);
+}
+

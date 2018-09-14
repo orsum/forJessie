@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    double s1, s2, s3;
+    printf("Enter the first score: \n");
+    fflush(stdout);
+    scanf("%lg", &s1);
+    printf("Enter the second score: \n");
+    fflush(stdout);
+    scanf("%lg", &s2);
+    printf("Enter the third score: \n");
+    fflush(stdout);
+    scanf("%lg", &s3);
+    if (s1 < s2 && s1 < s3) {
+        printf("%f\n", (s2+s3)/2);
+    } else if (s2 < s1 && s2 < s3) {
+        printf("%f\n", (s1+s3)/2);
+    } else if (s3 < s2 && s3 < s1) {
+        printf("%f\n", (s2+s1)/2);
+    }
+    return EXIT_SUCCESS;
+}
+    

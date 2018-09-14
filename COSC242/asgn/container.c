@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "mylib.h"
+#include "container.h"
+#include "rbt.h"
+#include "flexarray.h"
+
+/**@author Ali Morris, Abigail Tubay, Chenyang Zhang
+   This file holds in a structure either a red black tree or a
+   flexarray and creates, searches, free, appends/adds to or prints its values.
+*/
+
+/**object consisting of named members of various types
+   type - the type of container being used(red black tree or flexarray)
+   contents - a pointer to the container
+*/
+struct containerrec {
+    container_t type;
+    void *contents;
+};
+
+/**a function passed to the container to print a word.
+   @param word - the word to be printed
+*/
+void print(char *word){
+    printf("%s ", word);
+}
+
+/**adds a new word to either container type
+   @param c - a pointer to the container to be added to
+   @param word - the word to add to the container
+*/
+void container_add(container c, char *word) {
+    if (c->type == RED_BLACK_TREE) {
+        c->contents = rbt_insert(c->contents, word);
+    } else {
+        flexarray_append(c->contents, word);
+    }
+}
+
+/**frees the allocated memory of the container when it isnt needed anymore
+   @param c - a pointer to the container to be freed
+   @return the newly freed container
+*/
+container container_free(container c){
+    if(c==NULL){
+        return c;
+    }
+    if (c->type == RED_BLACK_TREE) {
+        c->contents = rbt_free(c->contents);
+    } else {
+        flexarray_free(c->contents);
+    }
+    free(c);
+    return c;
+}
+
+/**creates a new container of the requested type
+   @param t - type of container to be created
+   @return the newly created container
+*/
+container container_new(int t){
+    container c = emalloc(sizeof *c);
+    if (t == 'r'){
+        c->type = RED_BLACK_TREE;
+        c->contents = rbt_new();
+    } else{
+        c->type = FLEX_ARRAY;
+        c->contents = flexarray_new();
+    }
+    return c;
+}
+
+/**searches the container for the requested word
+   @param c - a pointer to the container to be created
+   @param str - the string to be searched for
+   @return an int value for true(1) or false(0) if the word has been found
+*/
+int container_search(container c, char *str){
+    int exists;
+    if(c==NULL){
+        return 0;
+    }
+    if (c->type == RED_BLACK_TREE) {
+        exists = rbt_search(c->contents, str);
+    } else {
+        exists = is_present(c->contents, str);
+    }
+    return exists;
+}
+
+/**prints all the words in the container on one line
+   @param c - a pointer to the container to be created 
+*/
+void container_print(container c){
+    if (c->type == RED_BLACK_TREE) {
+        rbt_preorder(c->contents, print);
+    } else {
+        flexarray_visit(c->contents, print);
+    }
+}
+

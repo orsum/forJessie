@@ -1,0 +1,82 @@
+#include "flexarray.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+struct flexarrayrec {
+    int capacity;
+    int itemcount;
+    int *items;
+};
+
+void selection_sort(int *a, int n){
+    int smallest, i, j, temp, k;
+    for (i = 0; i < n/2; i++){
+        smallest = a[i];
+        for (j = i+1; j < n; j++){
+            if (a[j] < a[smallest]){
+                smallest = j;
+            }
+        }
+        temp = a[i];
+        a[i] = a[smallest];
+        a[smallest] = temp;
+        if (i == n/2){
+            for (k = 0; k < n; k++){
+                fprintf(stderr, "%d\n", a[k]);
+            }
+        }
+    }
+}
+
+void *emalloc(size_t s){
+    void *my_array = malloc(s);
+    if (NULL == my_array) {
+        fprintf(stderr, "memory reallocation failed");
+        exit(EXIT_FAILURE);
+    }
+    return my_array;
+}
+
+void *erealloc(void *a, size_t s){
+    a = realloc(a, s);
+    if (NULL == a) {
+        fprintf(stderr, "memory reallocation failed");
+        exit(EXIT_FAILURE);
+    }
+    return a;
+}
+
+flexarray flexarray_new() {
+    flexarray f = emalloc(sizeof *f);
+    f->itemcount = 0;
+    f->capacity = 2;
+    f->items = emalloc(f->capacity * sizeof f->items[0]);
+    return f;
+}
+
+void flexarray_append(flexarray f, int num) {
+    if (f->capacity == f->itemcount){
+        f->capacity *= 2;
+        f->items = erealloc(f->items, f->capacity * sizeof f->items[0]);
+    }
+    f->items[f->itemcount] = num;
+    f->itemcount++;
+}
+
+void flexarray_print(flexarray f) {
+    int i;
+    for(i = 0; i < f->itemcount; i++){
+        printf("%d\n", f->items[i]);
+    }
+}
+
+void flexarray_sort(flexarray f) {
+    if (f->itemcount < 2){
+        selection_sort(f->items, f->itemcount);
+    }
+}
+
+void flexarray_free(flexarray f) {
+    free(f->items);
+    free(f);
+}

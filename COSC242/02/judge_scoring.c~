@@ -1,0 +1,18 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int n;
+    int count = 0;
+    double judge1[10], judge2[10], judge3[10];
+    while(4 == scanf("%d%lg%lg%lg",&n,&judge1[count],&judge2[count],
+                     &judge3[count]){
+          count++;
+    }
+          
+          for(n = 0; n < count; n++){
+              
+          }
+    
+    return EXIT_SUCCESS;
+}

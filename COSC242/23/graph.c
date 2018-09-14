@@ -1,0 +1,196 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include "mylib.h"
+#include "graph.h"
+
+
+/**
+   enum for defining whether a node has been checked for distance or not during
+   searches
+*/
+typedef enum { UNVISITED, VISITED_SELF, VISITED_DESCENDANTS } state_t;
+
+/**
+   struct for the array of values for bfs
+*/
+struct vertexrec {
+    int predecessor;
+    int distance;
+    state_t state;
+    int finish;
+};
+
+/**
+   struct to hold all the attributes of the graph
+*/
+struct graphrec {
+    int size;
+    struct vertexrec *vertices;
+    int **edges;
+};
+
+/**
+   creates a graph and allocates memory for all attributes
+   @param size - the number of nodes the new graph will have
+   @return the new graph
+*/
+graph graph_new(int size){
+    int i, j;
+    graph g = emalloc(sizeof *g);
+    g->size = size;
+    g->vertices = emalloc(size * sizeof *(g->vertices));
+    g->edges = emalloc(size * sizeof g->edges[0]);
+    for (i = 0; i < size; i++){
+        g->edges[i] = emalloc(size * sizeof g->edges[0][0]);
+        for (j = 0; j < size; j++){
+            g->edges[i][j] = 0;
+        }
+    }
+    return g;
+}
+
+/**
+   adds a unidirectional edge to the graph
+   @param g - the graph to be added to
+   @param a - the node from
+   @param b - the node to
+   @return the adjusted graph
+*/
+graph graph_add_edges(graph g, int a, int b){
+    g->edges[a][b] = 1;
+    return g;
+}
+
+/**
+   adds a bidirectional edge to the graph
+   @param g - the graph to be added to
+   @param a - the node from
+   @param b - the node to
+   @return the adjusted graph
+*/
+graph graph_add_2edges(graph g, int a, int b){
+    g->edges[a][b] = 1;
+    g->edges[b][a] = 1;
+    return g;
+}
+
+/**
+   frees any memory allocated for the graph
+   @param the graph to be freed
+   @return null
+*/
+graph graph_free(graph g){
+    int i;
+    for (i = 0; i < g->size; i++){
+        free(g->edges[i]);
+    }
+    
+    free(g->edges);
+    
+    
+    free(g->vertices);
+    
+    free(g);
+    
+    return NULL;
+}
+
+/**
+   prints the nodes adjacent for each node
+   @param the graph to be printed
+*/
+void graph_print(graph g){
+    int i, j;
+    printf("adjacency list:\n");
+    for (i = 0; i < g->size; i++){
+        printf("%i  |  ", i);
+        for (j = 0; j < g->size; j++){
+            if(g->edges[i][j] == 1){
+                printf("%i, ", j);
+            }
+        }
+        printf("\n");
+    }
+}
+
+/**
+   prints the results of the bfs
+   @param the graph to be printed
+*/
+void print_dfs(graph g){
+    int i;
+    printf("\nvertex distance pred finish\n");
+    for (i = 0; i < g->size; i++){
+        printf("%6d%9d%5d%7d\n", i, g->vertices[i].distance,
+               g->vertices[i].predecessor, g->vertices[i].finish);
+    }
+}
+
+
+
+int step;
+/**
+   visits adjaent nodes and adds the distance
+   @param g - the graph with the nodes
+   @param v - the key of the node to check from
+   @param step - the current distance
+   @return the adjusted graph
+*/
+graph visit(graph g, int v) {
+
+    int u;
+    
+    g->vertices[v].state = VISITED_SELF;
+    
+    step++;
+    
+    g->vertices[v].distance = step;
+    
+    for (u = 0; u < g->size; u++){
+        
+        if (g->edges[v][u] == 1 && g->vertices[u].state == UNVISITED){
+
+            g->vertices[u].predecessor = v;
+            visit(g, u);
+  
+        }
+    }
+
+    step++;
+
+    g->vertices[v].state = VISITED_DESCENDANTS;
+    g->vertices[v].finish = step;
+
+    return g;
+}
+
+
+/**
+   does a depth first search to calculate the distances from one node to all
+   others
+   @param g - the graph with the nodes
+   @return the adjusted graph
+*/
+graph graph_dfs(graph g) {
+    int i;
+
+    for (i = 0; i < g->size; i++) {
+
+        g->vertices[i].state = UNVISITED;
+        g->vertices[i].predecessor = -1;
+    }
+    
+    step = 0;
+    for (i = 0; i < g->size; i++){
+        
+        if (g->vertices[i].state == UNVISITED){
+          
+            visit(g, i);
+        }
+      
+    }
+    print_dfs(g);
+    return g;
+}
+
+
